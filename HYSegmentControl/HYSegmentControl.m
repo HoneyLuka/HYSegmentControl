@@ -58,6 +58,14 @@
     }
 }
 
+- (void)setUnderLineColor:(UIColor *)underLineColor
+{
+  if (_underLineColor != underLineColor) {
+    _underLineColor = underLineColor;
+    self.underLine.backgroundColor = underLineColor;
+  }
+}
+
 - (void)setupButtonNames:(NSArray *)names
 {
     if (names.count) {
@@ -84,6 +92,7 @@
     
     for (NSString *name in self.names) {
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+        button.exclusiveTouch = YES;
         [button setTitleColor:self.fontColor forState:UIControlStateNormal];
         button.titleLabel.font = self.font;
         [button setTitle:name forState:UIControlStateNormal];
@@ -141,6 +150,12 @@
     
     CGFloat x = [self getXToIndex:index];
     CGFloat width = [self getButtonWidthAtIndex:index];
+    for (UIButton *tempButton in self.buttons) {
+      [tempButton setTitleColor:self.fontColor forState:UIControlStateNormal];
+    }
+    UIButton *button = self.buttons[index];
+    [button setTitleColor:self.highlightFontColor forState:UIControlStateNormal];
+  
     if (animated) {
         [UIView animateWithDuration:0.2f animations:^{
             self.underLine.frame = CGRectMake(x, CGRectGetHeight(self.bounds)-self.underLineHeight, width, self.underLineHeight);
@@ -164,7 +179,7 @@
 - (void)setScrollViewScrollToIndex:(int)index animated:(BOOL)animated
 {
     if (index >= self.buttons.count ||
-        index < 0) {
+        index < 0 || self.scrollView.contentSize.width <= CGRectGetWidth(self.bounds)) {
         
         return;
     }
@@ -178,7 +193,7 @@
     }
     
     [self.scrollView setContentOffset:CGPointMake(offsetX, 0) animated:YES];
-    
+//  [self.scrollView scrollRectToVisible:button.frame animated:YES];
 }
 
 - (void)buttonClick:(UIButton *)button
@@ -251,6 +266,7 @@
     self.spacing = 15.f;
     self.font = [UIFont systemFontOfSize:15.f];
     self.fontColor = [UIColor blackColor];
+    self.highlightFontColor = [UIColor orangeColor];
     self.underLineColor = [UIColor orangeColor];
     self.underLineHeight = 2.f;
     self.bgColor = [UIColor whiteColor];

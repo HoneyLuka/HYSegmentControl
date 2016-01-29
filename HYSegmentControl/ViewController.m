@@ -31,9 +31,9 @@
 //    self.control.bgImage = [UIImage imageNamed:@"contentview_sectionheader"];
 //    self.control.spacing = 25.f;
 //    self.control.fontColor = [UIColor lightGrayColor];
-//    self.control.underLineColor = [UIColor greenColor];
+    self.control.underLineColor = [UIColor greenColor];
 //    self.control.underLineHeight = 5.f;
-    [self.control setupButtonNames:@[@"今天", @"明天", @"后天", @"大后天", @"大大后天", @"大大大后天", @"大大大大后天"]];
+    [self.control setupButtonNames:@[@"今天", @"明天", @"后天", @"大后天"]];
     [self.view addSubview:self.control];
     self.control.delegate = self;
     
@@ -59,14 +59,14 @@
     self.scrollView.pagingEnabled = YES;
     [self.view addSubview:self.scrollView];
     self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.bounds) * 7, CGRectGetHeight(self.scrollView.bounds));
+    self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.bounds) * 4, CGRectGetHeight(self.scrollView.bounds));
 }
 
 
 
 - (void)setInsideViews
 {
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 4; i++) {
         UILabel *view = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.scrollView.bounds), CGRectGetHeight(self.scrollView.bounds))];
         view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         view.text = [NSString stringWithFormat:@"%d", i];
@@ -87,7 +87,7 @@
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-    self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.bounds) * 7, CGRectGetHeight(self.scrollView.bounds));
+    self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.bounds) * 4, CGRectGetHeight(self.scrollView.bounds));
     int i = 0;
     for (UIView *view in self.insideViewsArray) {
         CGPoint center = CGPointMake(CGRectGetWidth(self.scrollView.bounds)/2 + CGRectGetWidth(self.scrollView.bounds)*i, CGRectGetHeight(self.scrollView.bounds)/2);

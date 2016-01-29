@@ -36,6 +36,11 @@
 @property (nonatomic, strong) UIColor *fontColor;
 
 /**
+ 按钮选中字体颜色, 默认是orange
+ */
+@property (nonatomic, strong) UIColor *highlightFontColor;
+
+/**
  提示线颜色, 默认是orangeColor
  */
 @property (nonatomic, strong) UIColor *underLineColor;
