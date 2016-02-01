@@ -12,7 +12,7 @@
 @protocol HYSegmentControlDelegate <NSObject>
 
 @optional
-- (void)segmentControl:(HYSegmentControl *)control didSelectButtonAtIndex:(int)index;
+- (void)segmentControl:(HYSegmentControl *)control didSelectButtonAtIndex:(NSInteger)index;
 
 @end
 
@@ -34,6 +34,11 @@
  按钮字体颜色, 默认是blackColor
  */
 @property (nonatomic, strong) UIColor *fontColor;
+
+/**
+ 按钮最小宽度，默认是40.f
+ */
+@property (nonatomic, assign) CGFloat buttonMinWidth;
 
 /**
  按钮选中字体颜色, 默认是orange
@@ -64,20 +69,18 @@
  使用该方法设置元素项, 数组内元素为NSString.
  
  !注意: 如果需要使用上边的属性来自定义控件的外观, 请在修改后再调用这个方法.
-      (这个方法调用后再修改控件的属性可能无效.)
+ (这个方法调用后再修改控件的属性可能无效.)
  */
 - (void)setupButtonNames:(NSArray *)names;
 
 /**
- 手动设置选中项. (使用这个方法切换选中项不会触发delegate回调方法)
+ 用这个方法设置当前选中项(不会触发delegate)
  */
-- (void)setIndexTo:(int)index animated:(BOOL)animated completion:(void(^)(BOOL finished))completion;
+- (void)setCurrentIndex:(NSInteger)index;
 
 #pragma mark - ScrollView Method
 
-/**
- 在scrollView的同名delegate方法内调用, 可以自动根据滑动的页数切换选择项.
- */
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView;
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView;
 
 @end

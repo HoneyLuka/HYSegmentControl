@@ -16,11 +16,11 @@
 
 @property (nonatomic, strong) NSMutableArray *buttons;
 
-@property (nonatomic, strong) UIImageView *underLine;
+@property (nonatomic, strong) UIView *underLine;
 
 @property (nonatomic, strong) UIImageView *bgImageView;
 
-@property (nonatomic, assign) int selectIndex;
+@property (nonatomic, assign) NSInteger selectIndex;
 
 @end
 
@@ -28,34 +28,34 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-    self = [super initWithFrame:frame];
-    if (self) {
-        // Initialization code
-        self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        [self initProperty];
-        [self setupSubViews];
-    }
-    return self;
+  self = [super initWithFrame:frame];
+  if (self) {
+    // Initialization code
+    self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [self initProperty];
+    [self setupSubViews];
+  }
+  return self;
 }
 
 - (void)setBgImage:(UIImage *)bgImage
 {
-    if (_bgImage != bgImage) {
-        _bgImage = bgImage;
-        self.bgColor = nil;
-        self.bgImageView.backgroundColor = nil;
-        self.bgImageView.image = bgImage;
-    }
+  if (_bgImage != bgImage) {
+    _bgImage = bgImage;
+    self.bgColor = nil;
+    self.bgImageView.backgroundColor = nil;
+    self.bgImageView.image = bgImage;
+  }
 }
 
 - (void)setBgColor:(UIColor *)bgColor
 {
-    if (_bgColor != bgColor) {
-        _bgColor = bgColor;
-        self.bgImage = nil;
-        self.bgImageView.image = nil;
-        self.bgImageView.backgroundColor = bgColor;
-    }
+  if (_bgColor != bgColor) {
+    _bgColor = bgColor;
+    self.bgImage = nil;
+    self.bgImageView.image = nil;
+    self.bgImageView.backgroundColor = bgColor;
+  }
 }
 
 - (void)setUnderLineColor:(UIColor *)underLineColor
@@ -68,235 +68,242 @@
 
 - (void)setupButtonNames:(NSArray *)names
 {
-    if (names.count) {
-        self.names = names;
-        [self setupButtons];
-        [self setUnderLineToIndex:self.selectIndex animated:NO completion:nil];
-    }
+  if (names.count) {
+    self.names = names;
+    [self setupButtons];
+    [self reset];
+  }
 }
 
 - (void)setupButtons
 {
-    if (self.buttons) {
-        [self.buttons makeObjectsPerformSelector:@selector(removeFromSuperview)];
-        [self.buttons removeAllObjects];
-    } else {
-        self.buttons = [NSMutableArray array];
-    }
-    
-    CGSize constrainSize = CGSizeMake(1000, CGRectGetHeight(self.bounds));
-    
-    CGFloat currentX = self.spacing;
-    
-    int buttonIndex = 0;
-    
-    for (NSString *name in self.names) {
-        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-        button.exclusiveTouch = YES;
-        [button setTitleColor:self.fontColor forState:UIControlStateNormal];
-        button.titleLabel.font = self.font;
-        [button setTitle:name forState:UIControlStateNormal];
-        
-        CGSize size = [name sizeWithFont:self.font constrainedToSize:constrainSize lineBreakMode:NSLineBreakByWordWrapping];
-        
-        CGRect buttonFrame = CGRectMake(currentX, 0, size.width, CGRectGetHeight(self.bounds));
-        button.frame = buttonFrame;
-        
-        [self.scrollView addSubview:button];
-        [self.buttons addObject:button];
-        
-        [button addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
-        
-        button.tag = buttonIndex;
-        buttonIndex++;
-        
-        currentX += CGRectGetWidth(buttonFrame) + self.spacing;
-    }
-    [self calculateScrollViewContentSize];
-}
-
-- (CGFloat)getXToIndex:(int)index
-{
-    if (index >= self.buttons.count ||
-        index < 0) {
-        return 0;
-    }
-    
-    CGFloat x = self.spacing;
-    
-    for (int i = 0; i < index; i++) {
-        UIButton *button = self.buttons[i];
-        x += CGRectGetWidth(button.bounds) + self.spacing;
-    }
-    return x;
-}
-
-- (CGFloat)getButtonWidthAtIndex:(int)index
-{
-    if (index >= self.buttons.count) {
-        return 0;
-    }
-    UIButton *button = self.buttons[index];
-    return CGRectGetWidth(button.bounds);
-}
-
-- (void)setUnderLineToIndex:(int)index animated:(BOOL)animated completion:(void(^)(BOOL finished))completion
-{
-    if (index >= self.buttons.count) {
-        return;
-    }
-    
-    self.userInteractionEnabled = NO;
-    
-    CGFloat x = [self getXToIndex:index];
-    CGFloat width = [self getButtonWidthAtIndex:index];
-    for (UIButton *tempButton in self.buttons) {
-      [tempButton setTitleColor:self.fontColor forState:UIControlStateNormal];
-    }
-    UIButton *button = self.buttons[index];
-    [button setTitleColor:self.highlightFontColor forState:UIControlStateNormal];
+  if (self.buttons) {
+    [self.buttons makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    [self.buttons removeAllObjects];
+  } else {
+    self.buttons = [NSMutableArray array];
+  }
   
-    if (animated) {
-        [UIView animateWithDuration:0.2f animations:^{
-            self.underLine.frame = CGRectMake(x, CGRectGetHeight(self.bounds)-self.underLineHeight, width, self.underLineHeight);
-        } completion:^(BOOL finished) {
-            self.userInteractionEnabled = YES;
-            
-            if (completion) {
-                completion(finished);
-            }
-        }];
-    } else {
-        self.underLine.frame = CGRectMake(x, CGRectGetHeight(self.bounds)-self.underLineHeight, width, self.underLineHeight);
-        self.userInteractionEnabled = YES;
-        if (completion) {
-            completion(YES);
-        }
-    }
+  CGSize constrainSize = CGSizeMake(1000, CGRectGetHeight(self.bounds));
+  
+  CGFloat currentX = self.spacing;
+  
+  int buttonIndex = 0;
+  
+  for (NSString *name in self.names) {
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.exclusiveTouch = YES;
+    [button setTitleColor:self.fontColor forState:UIControlStateNormal];
+    button.titleLabel.font = self.font;
+    [button setTitle:name forState:UIControlStateNormal];
     
+    CGSize size = [name sizeWithFont:self.font constrainedToSize:constrainSize lineBreakMode:NSLineBreakByWordWrapping];
+    
+    CGRect buttonFrame = CGRectMake(currentX, 0, MAX(size.width, self.buttonMinWidth), CGRectGetHeight(self.bounds));
+    button.frame = buttonFrame;
+    
+    [self.scrollView addSubview:button];
+    [self.buttons addObject:button];
+    
+    [button addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
+    
+    button.tag = buttonIndex;
+    buttonIndex++;
+    
+    currentX += CGRectGetWidth(buttonFrame) + self.spacing;
+  }
+  [self calculateScrollViewContentSize];
 }
 
-- (void)setScrollViewScrollToIndex:(int)index animated:(BOOL)animated
+- (void)reset
 {
-    if (index >= self.buttons.count ||
-        index < 0 || self.scrollView.contentSize.width <= CGRectGetWidth(self.bounds)) {
-        
-        return;
-    }
-    
-    UIButton *button = self.buttons[index];
-    CGFloat offsetX = button.center.x - CGRectGetWidth(self.bounds)/2;
-    if (offsetX > self.scrollView.contentSize.width - CGRectGetWidth(self.bounds)) {
-        offsetX = self.scrollView.contentSize.width - CGRectGetWidth(self.bounds);
-    } else if (offsetX < 0) {
-        offsetX = 0;
-    }
-    
-    [self.scrollView setContentOffset:CGPointMake(offsetX, 0) animated:YES];
-//  [self.scrollView scrollRectToVisible:button.frame animated:YES];
+  [self setCurrentIndex:0];
 }
 
-- (void)buttonClick:(UIButton *)button
+- (CGFloat)getXToIndex:(NSInteger)index
 {
-    int buttonTag = button.tag;
-    
-    if (self.selectIndex == buttonTag) {
-        return;
-    }
-    
-    [self setSelectIndexTo:buttonTag];
-    
-    if (self.delegate && [self.delegate respondsToSelector:@selector(segmentControl:didSelectButtonAtIndex:)]) {
-        [self.delegate segmentControl:self didSelectButtonAtIndex:self.selectIndex];
-    }
+  if (index >= self.buttons.count ||
+      index < 0) {
+    return 0;
+  }
+  
+  CGFloat x = self.spacing;
+  
+  for (int i = 0; i < index; i++) {
+    UIButton *button = self.buttons[i];
+    x += CGRectGetWidth(button.bounds) + self.spacing;
+  }
+  return x;
 }
 
-- (void)setSelectIndexTo:(int)index
+- (CGFloat)getButtonWidthAtIndex:(NSInteger)index
 {
-    if (self.selectIndex == index) {
-        return;
-    }
-    self.selectIndex = index;
-    
-    __weak HYSegmentControl *weakSelf = self;
-    [self setUnderLineToIndex:index animated:YES completion:^(BOOL finished) {
-        [weakSelf setScrollViewScrollToIndex:index animated:YES];
-    }];
-}
-
-- (void)setIndexTo:(int)index animated:(BOOL)animated completion:(void (^)(BOOL finished))completion
-{
-    if (index == self.selectIndex) {
-        if (completion) {
-            completion(YES);
-        }
-        return;
-    }
-    
-    if (index >= self.buttons.count ||
-        index < 0) {
-        
-        return;
-    }
-    
-    self.selectIndex = index;
-    
-    __weak HYSegmentControl *weakSelf = self;
-    [self setUnderLineToIndex:index animated:animated completion:^(BOOL finished) {
-        [weakSelf setScrollViewScrollToIndex:index animated:animated];
-        if (completion) {
-            completion(finished);
-        }
-    }];
-}
-
-- (void)calculateScrollViewContentSize
-{
-    CGFloat width = self.spacing;
-    
-    for (UIButton *button in self.buttons) {
-        width += CGRectGetWidth(button.bounds) + self.spacing;
-    }
-    
-    self.scrollView.contentSize = CGSizeMake(width, CGRectGetHeight(self.bounds));
+  if (index >= self.buttons.count) {
+    return 0;
+  }
+  UIButton *button = self.buttons[index];
+  return CGRectGetWidth(button.bounds);
 }
 
 - (void)initProperty
 {
-    self.spacing = 15.f;
-    self.font = [UIFont systemFontOfSize:15.f];
-    self.fontColor = [UIColor blackColor];
-    self.highlightFontColor = [UIColor orangeColor];
-    self.underLineColor = [UIColor orangeColor];
-    self.underLineHeight = 2.f;
-    self.bgColor = [UIColor whiteColor];
+  self.spacing = 15.f;
+  self.font = [UIFont systemFontOfSize:15.f];
+  self.fontColor = [UIColor blackColor];
+  self.buttonMinWidth = 40.f;
+  self.highlightFontColor = [UIColor orangeColor];
+  self.underLineColor = [UIColor orangeColor];
+  self.underLineHeight = 2.f;
+  self.bgColor = [UIColor whiteColor];
 }
 
 - (void)setupSubViews
 {
-    self.bgImageView = [[UIImageView alloc]initWithFrame:self.bounds];
-    self.bgImageView.backgroundColor = self.bgColor;
-    self.bgImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    [self addSubview:self.bgImageView];
+  self.bgImageView = [[UIImageView alloc]initWithFrame:self.bounds];
+  self.bgImageView.backgroundColor = self.bgColor;
+  self.bgImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+  [self addSubview:self.bgImageView];
+  
+  self.scrollView = [[UIScrollView alloc]initWithFrame:self.bounds];
+  self.scrollView.showsHorizontalScrollIndicator = NO;
+  self.scrollView.showsVerticalScrollIndicator = NO;
+  self.scrollView.bounces = NO;
+  
+  self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+  
+  [self addSubview:self.scrollView];
+  
+  self.underLine = [[UIView alloc]init];
+  self.underLine.backgroundColor = self.underLineColor;
+  [self.scrollView addSubview:self.underLine];
+}
+
+- (void)calculateScrollViewContentSize
+{
+  CGFloat width = self.spacing;
+  
+  for (UIButton *button in self.buttons) {
+    width += CGRectGetWidth(button.bounds) + self.spacing;
+  }
+  
+  self.scrollView.contentSize = CGSizeMake(width, CGRectGetHeight(self.bounds));
+}
+
+- (void)setUnderLinePosition:(CGFloat)offsetX width:(CGFloat)width
+{
+  self.underLine.frame = CGRectMake(offsetX, CGRectGetHeight(self.bounds)-self.underLineHeight, width, self.underLineHeight);
+}
+
+- (void)setScrollViewScrollToIndex:(NSInteger)index animated:(BOOL)animated
+{
+  if (index >= self.buttons.count ||
+      index < 0 || self.scrollView.contentSize.width <= CGRectGetWidth(self.bounds)) {
+    return;
+  }
+  
+  UIButton *button = self.buttons[index];
+  CGFloat offsetX = button.center.x - CGRectGetWidth(self.bounds)/2;
+  if (offsetX > self.scrollView.contentSize.width - CGRectGetWidth(self.bounds)) {
+    offsetX = self.scrollView.contentSize.width - CGRectGetWidth(self.bounds);
+  } else if (offsetX < 0) {
+    offsetX = 0;
+  }
+  
+  [self.scrollView setContentOffset:CGPointMake(offsetX, 0) animated:YES];
+}
+
+- (void)setCurrentIndex:(NSInteger)index
+{
+  [self setCurrentIndex:index percent:0];
+}
+
+- (void)setCurrentIndex:(NSInteger)index percent:(CGFloat)percent
+{
+  CGFloat nowX = [self getXToIndex:index];
+  CGFloat nowWidth = [self getButtonWidthAtIndex:index];
+  
+  if (index < self.buttons.count - 1) {
+    self.selectIndex = percent > 0.5 ? index + 1 : index;
+    [self highlightButtonAtIndex:percent > 0.5 ? index + 1 : index];
     
-    self.scrollView = [[UIScrollView alloc]initWithFrame:self.bounds];
-    self.scrollView.showsHorizontalScrollIndicator = NO;
-    self.scrollView.showsVerticalScrollIndicator = NO;
-    self.scrollView.bounces = NO;
-    
-    self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    
-    [self addSubview:self.scrollView];
-    
-    self.underLine = [[UIImageView alloc]init];
-    self.underLine.backgroundColor = self.underLineColor;
-    [self.scrollView addSubview:self.underLine];
+    CGFloat nextX = [self getXToIndex:index + 1];
+    CGFloat nextWidth = [self getButtonWidthAtIndex:index + 1];
+    [self setUnderLinePosition:(nextX - nowX) * percent + nowX
+                         width:(nextWidth - nowWidth) * percent + nowWidth];
+  } else {
+    self.selectIndex = index;
+    [self highlightButtonAtIndex:index];
+    [self setUnderLinePosition:nowX width:nowWidth];
+  }
+}
+
+- (void)highlightButtonAtIndex:(NSInteger)index
+{
+  if (index >= self.buttons.count || index < 0) {
+    return;
+  }
+  
+  for (UIButton *tempButton in self.buttons) {
+    [tempButton setTitleColor:self.fontColor forState:UIControlStateNormal];
+  }
+  
+  UIButton *button = self.buttons[index];
+  [button setTitleColor:self.highlightFontColor forState:UIControlStateNormal];
+}
+
+#pragma mark - Action
+
+- (void)notifyDelegate
+{
+  if ([self.delegate respondsToSelector:@selector(segmentControl:didSelectButtonAtIndex:)]) {
+    [self.delegate segmentControl:self didSelectButtonAtIndex:self.selectIndex];
+  }
+}
+
+- (void)buttonClick:(UIButton *)button
+{
+  NSInteger buttonTag = button.tag;
+  
+  if (self.selectIndex == buttonTag) {
+    return;
+  }
+  
+  self.selectIndex = buttonTag;
+  [self notifyDelegate];
+}
+
+#pragma mark - ScrollView Method
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+  NSInteger width = CGRectGetWidth(scrollView.bounds);
+  NSInteger offsetX = scrollView.contentOffset.x;
+  CGFloat percentNum = offsetX % width;
+  if (percentNum > width) {
+    percentNum = width;
+  } else if (percentNum < 0) {
+    percentNum = 0;
+  }
+  
+  CGFloat percent =  percentNum / width;
+  NSInteger index = scrollView.contentOffset.x / width;
+  if (index < 0) {
+    index = 0;
+  }
+  
+  if (index >= self.buttons.count) {
+    index = self.buttons.count - 1;
+  }
+  
+  [self setCurrentIndex:index percent:percent];
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    int index = scrollView.contentOffset.x / CGRectGetWidth(scrollView.bounds);
-    [self setSelectIndexTo:index];
+  if (!scrollView.isTracking) {
+    [self notifyDelegate];
+    [self setScrollViewScrollToIndex:self.selectIndex animated:YES];
+  }
 }
 
 @end

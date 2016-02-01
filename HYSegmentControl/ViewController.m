@@ -23,83 +23,85 @@
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
-    
-    self.control = [[HYSegmentControl alloc]initWithFrame:CGRectMake(0, 20, CGRectGetWidth(self.view.bounds), 30)];
-    self.control.bgColor = [UIColor whiteColor];
-//    self.control.bgImage = [UIImage imageNamed:@"contentview_sectionheader"];
-//    self.control.spacing = 25.f;
-//    self.control.fontColor = [UIColor lightGrayColor];
-    self.control.underLineColor = [UIColor greenColor];
-//    self.control.underLineHeight = 5.f;
-    [self.control setupButtonNames:@[@"今天", @"明天", @"后天", @"大后天"]];
-    [self.view addSubview:self.control];
-    self.control.delegate = self;
-    
-    [self setupScrollView];
-    [self setInsideViews];
+  [super viewDidLoad];
+  // Do any additional setup after loading the view, typically from a nib.
+  
+  self.control = [[HYSegmentControl alloc]initWithFrame:CGRectMake(0, 20, CGRectGetWidth(self.view.bounds), 30)];
+  self.control.bgColor = [UIColor whiteColor];
+  self.control.underLineColor = [UIColor greenColor];
+  self.control.delegate = self;
+  [self.control setupButtonNames:@[@"今天", @"明天三", @"后天", @"大后天哈哈", @"V"]];
+  [self.view addSubview:self.control];
+  
+  
+  [self setupScrollView];
+  [self setInsideViews];
+  
+  [self.control setCurrentIndex:1];
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+  [self.control scrollViewDidScroll:scrollView];
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    [self.control scrollViewDidEndDecelerating:scrollView];
+  [self.control scrollViewDidEndDecelerating:scrollView];
 }
 
-- (void)segmentControl:(HYSegmentControl *)control didSelectButtonAtIndex:(int)index
+- (void)segmentControl:(HYSegmentControl *)control didSelectButtonAtIndex:(NSInteger)index
 {
-    CGPoint contentOffset = CGPointMake(CGRectGetWidth(self.view.bounds) * index, 0);
-    [self.scrollView setContentOffset:contentOffset animated:YES];
+  CGPoint contentOffset = CGPointMake(CGRectGetWidth(self.view.bounds) * index, 0);
+  [self.scrollView setContentOffset:contentOffset animated:YES];
 }
 
 - (void)setupScrollView
 {
-    self.scrollView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 20.f + CGRectGetHeight(self.control.bounds), CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - 20.f - CGRectGetHeight(self.control.bounds))];
-    self.scrollView.delegate = self;
-    self.scrollView.pagingEnabled = YES;
-    [self.view addSubview:self.scrollView];
-    self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.bounds) * 4, CGRectGetHeight(self.scrollView.bounds));
+  self.scrollView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 20.f + CGRectGetHeight(self.control.bounds), CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - 20.f - CGRectGetHeight(self.control.bounds))];
+  self.scrollView.delegate = self;
+  self.scrollView.pagingEnabled = YES;
+  [self.view addSubview:self.scrollView];
+  self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+  self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.bounds) * 5, CGRectGetHeight(self.scrollView.bounds));
 }
-
-
 
 - (void)setInsideViews
 {
-    for (int i = 0; i < 4; i++) {
-        UILabel *view = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.scrollView.bounds), CGRectGetHeight(self.scrollView.bounds))];
-        view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        view.text = [NSString stringWithFormat:@"%d", i];
-        view.textAlignment = NSTextAlignmentCenter;
-        view.textColor = [UIColor whiteColor];
-        view.font = [UIFont systemFontOfSize:20.f];
-        view.backgroundColor = [UIColor blueColor];
-        [self.scrollView addSubview:view];
-        CGPoint center = CGPointMake(CGRectGetWidth(self.scrollView.bounds)/2 + CGRectGetWidth(self.scrollView.bounds)*i, CGRectGetHeight(self.scrollView.bounds)/2);
-        view.center = center;
-        
-        if (!self.insideViewsArray) {
-            self.insideViewsArray = [NSMutableArray array];
-        }
-        [self.insideViewsArray addObject:view];
+  for (int i = 0; i < 5; i++) {
+    UILabel *view = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.scrollView.bounds), CGRectGetHeight(self.scrollView.bounds))];
+    view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    view.text = [NSString stringWithFormat:@"%d", i];
+    view.textAlignment = NSTextAlignmentCenter;
+    view.textColor = [UIColor whiteColor];
+    view.font = [UIFont systemFontOfSize:20.f];
+    view.backgroundColor = [UIColor blueColor];
+    [self.scrollView addSubview:view];
+    CGPoint center = CGPointMake(CGRectGetWidth(self.scrollView.bounds)/2 + CGRectGetWidth(self.scrollView.bounds)*i, CGRectGetHeight(self.scrollView.bounds)/2);
+    view.center = center;
+    
+    if (!self.insideViewsArray) {
+      self.insideViewsArray = [NSMutableArray array];
     }
+    [self.insideViewsArray addObject:view];
+  }
 }
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-    self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.bounds) * 4, CGRectGetHeight(self.scrollView.bounds));
-    int i = 0;
-    for (UIView *view in self.insideViewsArray) {
-        CGPoint center = CGPointMake(CGRectGetWidth(self.scrollView.bounds)/2 + CGRectGetWidth(self.scrollView.bounds)*i, CGRectGetHeight(self.scrollView.bounds)/2);
-        view.center = center;
-        i++;
-    }
+  self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.bounds) * 5, CGRectGetHeight(self.scrollView.bounds));
+  int i = 0;
+  for (UIView *view in self.insideViewsArray) {
+    CGPoint center = CGPointMake(CGRectGetWidth(self.scrollView.bounds)/2 + CGRectGetWidth(self.scrollView.bounds)*i, CGRectGetHeight(self.scrollView.bounds)/2);
+    view.center = center;
+    i++;
+  }
 }
 
 - (void)didReceiveMemoryWarning
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+  [super didReceiveMemoryWarning];
+  // Dispose of any resources that can be recreated.
 }
 
 @end
